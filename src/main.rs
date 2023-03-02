@@ -17,14 +17,17 @@ struct Question {
     model: String,
     messages: Vec<Message>,
 }
+
 #[derive(Debug, Deserialize)]
 struct ResponseMessage {
     content: String,
 }
+
 #[derive(Debug, Deserialize)]
 struct ResponseChoice {
     message: ResponseMessage,
 }
+
 #[derive(Debug, Deserialize)]
 struct GPTResponse {
     choices: Vec<ResponseChoice>,
@@ -51,7 +54,10 @@ async fn ask_chat_gpt(client: &Client, api_key: &str, q: &Question, r: &Regex) {
         .send()
         .await
         .expect("Failed to send request");
-    let gpt_response: GPTResponse = response.json().await.expect("Failed to parse response");
+    let gpt_response: GPTResponse = response.json().await.unwrap_or_else(|err| {
+        eprintln!("Failed to parse response: {}", err);
+        panic!();
+    });
     println!(
         "{:?}",
         r.replace_all(&gpt_response.choices[0].message.content, "")
@@ -66,6 +72,7 @@ async fn main() {
     println!("Hi, what can I help you with? (type 'quit' to exit)");
     loop {
         let line: String = read!("{}\n");
+        let line = line.trim_end_matches('\n');
         if line == "quit" {
             break;
         }
