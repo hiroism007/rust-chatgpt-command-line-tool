@@ -18,12 +18,10 @@ struct Question {
     messages: Vec<Message>,
 }
 #[derive(Debug, Deserialize)]
-
 struct ResponseMessage {
     content: String,
 }
 #[derive(Debug, Deserialize)]
-
 struct ResponseChoice {
     message: ResponseMessage,
 }
